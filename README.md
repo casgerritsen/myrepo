@@ -4,5 +4,6 @@ Repository for testing my Git/GitHub setup
 Research goal:
 Compare the change of style of Avicii to the change of Kygo's style over the years.
 
-Comments plot:
-This plot is supposed to be a test to see if all the software works. It is still an ugly plot and does not say much, but it works. You can see the mean Acousticnes, Danceability and Energy of the playlists "This is Avicii", "This is Kygo" and "Disney Hits". I put the Disney Hits in it for perspective, but it does not add much, as all the values are a bit in the middle (not surprising, since it is the mean).
+Week 10 plots:
+In the png file are two chordograms. The first one is one of Kygo's 'Raging', while the second one is of Avicii's 'The Nights'. In the plots can be seen that 'Raging' has some kind of pattern where the chords are repeated after some time, while 'The Nights' has three moments where some of the same chords are used. Both songs make use of a so called 'drop'.  This has probably some relationship with these chordograms and how they are represent the song. 
+
