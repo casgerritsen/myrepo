@@ -1,0 +1,1245 @@
+---
+title: "Avicii vs Kygo"
+author: "Cas Gerritsen"
+date: "2024-02-20"
+output:
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    storyboard: true
+---
+
+```{r}
+library(tidyverse)
+library(tidymodels)
+library(spotifyr)
+library(ggplot2)
+library(plotly)
+library(compmus)
+library(gridExtra)
+library(flexdashboard)
+library(ggdendro)
+library(heatmaply)
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+Home
+===================================== 
+
+<style type="text/css">
+
+.overview {
+   font-size: 15px;
+}
+
+.myDiv {
+  width: 600px;
+  height: 500px;
+  overflow: auto;
+}
+</style>
+<!-- # Chapter 1: Intro -->
+Column {data-width=500}
+-----------------------------------------------------------------------
+### Overview {.overview}
+Embark on a melodic journey through the evolution of electronic dance music as we delve into the dynamic soundscapes of two iconic artists: Avicii and Kygo. In this captivating exploration, we dissect the metamorphosis of musical style over the years, meticulously analyzing the sonic innovations and creative ingenuity that have defined the discographies of these electronic titans. <br>
+<br>
+Why Avicii and Kygo, you may wonder? Beyond their chart-topping hits and global acclaim, these virtuosos hold a special place in the heart of the researcher. Year after year, their captivating compositions have dominated the coveted slots of the Spotify Wrapped Top 5 Artists, a testament not only to their immense popularity but also to the profound connection forged between their music and the listener's soul.<br>
+<br>
+Prepare to be entranced as we unravel the intricacies of Avicii's groundbreaking melodies, tracing the evolution from his euphoric anthems to the poignant depths of his later works. Contrast this with the tropical-infused beats and sun-kissed vibes that hallmark Kygo's signature sound, a testament to his ability to transport listeners to exotic locales through the power of music.<br>
+<br>
+Through meticulous analysis and keen observation, we aim to unravel the mysteries behind the ever-changing tapestry of sound, exploring how Avicii and Kygo have sculpted and redefined the landscape of electronic music. Join us on this exhilarating expedition, where passion meets precision, and every beat resonates with the pulse of innovation.The start can be found on the right, with a quick background of the two artists.<br>
+
+Column {.tabset}
+-----------------------------------------------------------------------
+### **The story of Avicii**
+ 
+Tim Bergling (8 September 1989 – 20 April 2018), known professionally as Avicii, was a Swedish musician, DJ, remixer, and record producer.<br>
+<br>
+At 16, Bergling began posting his remixes on electronic music forums, which led to his first record deal. He rose to prominence in 2011 with his single "Levels". His debut studio album, True (2013), blended electronic music with elements of multiple genres and received generally positive reviews. It peaked in the top ten in more than fifteen countries and topped international dance charts; the lead single, "Wake Me Up", topped most music markets in Europe and reached number four in the United States.<br>
+<br>
+In 2015, Bergling released his second studio album, Stories, and in 2017 he released an EP, Avīci (01).His catalogue also included the singles "I Could Be the One" with Nicky Romero, "You Make Me", "X You", "Hey Brother", "Addicted to You", "The Days", "The Nights", "Waiting for Love", "Without You" and "Lonely Together". Bergling was nominated for a Grammy Award for his work on "Sunshine" with David Guetta in 2012 and "Levels" in 2013. Several music publications credit Bergling as among the DJs who ushered electronic music into Top 40 radio in the early 2010s.<br>
+<br>
+Bergling retired from touring in 2016 due to health problems, having suffered stress and poor mental health for several years. On 20 April 2018, Avicii was found dead in Muscat, Oman. On 1 May, it was reported that the cause of his death was suicide from self-inflicted injuries from a broken wine bottle. He was buried on 8 June in his hometown of Stockholm, Sweden.<br>
+<br>
+![alt text](avicii.jpg "Title")
+<br>
+(https://simple.wikipedia.org/wiki/Avicii)
+
+### **The story of Kygo**
+
+Kyrre Gørvell-Dahll (born 11 September 1991), known professionally as Kygo, is a Norwegian DJ and record producer. He garnered international attention with his December 2013 remix of the track "I See Fire" by Ed Sheeran and his December 2014 single "Firestone" (featuring Conrad Sewell). In late 2015, he reached 1 billion streams on Spotify faster than any other artist, and by June 2016, he had reached 2 billion streams. <br>
+<br>
+Kygo has since released several singles, such as "Stole the Show", "Here for You", and "Stay" in 2015, "It Ain't Me" collaborating with Selena Gomez in 2017 and a 2019 remix of "Higher Love" performed by Whitney Houston, all of which have debuted on several international charts. His debut album, Cloud Nine, was released on 13 May 2016.<br>
+<br>
+Kygo became the first house music producer to perform at an Olympics closing ceremony in August 2016 at the 2016 Rio Olympics. In March 2018, Billboard ranked Kygo 3rd on its 2018 ranking of dance musicians titled Billboard Dance 100. The same year, he was ranked 32 on DJ Mag's top 100 DJs of the world, and in October 2019 he was ranked 42. <br>
+<br>
+![alt text](Kygo.jpg "Title")
+<br>
+(https://en.wikipedia.org/wiki/Kygo)
+
+The Corpus
+===================================== 
+
+Column {data-width=500}
+-----------------------------------------------------------------------
+
+### About the corpus
+The corpus exists of two playlists; one of each artist. I picked all the songs that are in their albums and most of the singles to create these playlists. I did not include remixes, or songs where the artist took part of, but is not featured in it. In the table on the right are the most interesting statistics listed and compared. The playlist with Avicii's songs can be found [here](https://open.spotify.com/playlist/3ucGSj6sO3iLaQin2jfyQh?si=6e46b257ac78421f). The playlist with Kygo's songs can be found [here](https://open.spotify.com/playlist/2M0XZxqAd3THfF3xWLJlSi?si=1e5c296e00ce41fd). <br>
+<br>
+On the right side, a few box plots can be seen with a more detailed comparison of the two playlists, where five different aspects are treated. A definition of the features that will be discussed in this report can be found on the Spotify Documentation (or [this](https://developer.spotify.com/documentation/web-api/reference/get-audio-features) link). <br>
+<br>
+In the first box plot, the energy of the songs can be seen. Here, you can see that the songs of Avicii have a somewhat higher energy. The median of both plots is almost right at the middle, so the plots are both normally distributed. One thing that can be noticed is the one outlier in Kygo's plot. Considering the results in the upcoming tabs, it can be concluded that this outlier is the song 'Intro'. <br>
+<br>
+In the danceability plot can be seen that the songs of Avicii have a much wider range of songs in terms of danceability. The plots are, again, normally distributed. This time, Avicii's playlist has one outlier, while Kygo has three of them. <br>
+<br>
+If we look at the next plot, the acousticness, we can conclude some interesting things. The most obvious one is that Avicii's songs have a really low acousticness. This should not be a surprise really, as he is know as a famous EDM (Electronic Dance Music) artist. Kygo has a higher acousticness, but still not a lot of songs above 0.4. Even the outliers of Kygo are a lot higher than Avicii's. Because of the median, which is close to the bottom of the box in Avicii's plot, this plot is positive skewed. This highlights the fact that most of the songs have a low acousticness. <br>
+<br>
+The next plot shows the tempo of the songs. Interesting to notice is the negative skew of Avicii's plot and the outliers on both sides. On the other hand has Kygo a normally distributed plot and a lot of outliers, all on the same side. <br>
+<br>
+The last plot shows the valence of the songs. This feature is a personal favorite, because of Spotify's system for distinguishing what is happy and what is sad music. In this case it is interesting to see the wide range of Avicii's songs and the overall lower score of Kygo compared to Avicii.
+
+Column {.tabset}
+-----------------------------------------------------------------------
+### Table Comparison
+```{r,  echo = FALSE}
+kygo_playlist_url <- "2M0XZxqAd3THfF3xWLJlSi"
+avicii_playlist_url <- "3ucGSj6sO3iLaQin2jfyQh"
+
+# Retrieve audio features for Kygo's playlist
+kygo_features <- get_playlist_audio_features("", kygo_playlist_url)
+kygo_features$artist <- "Kygo"
+
+# Retrieve audio features for Avicii's playlist
+avicii_features <- get_playlist_audio_features("", avicii_playlist_url)
+avicii_features$artist <- "Avicii"
+
+# Combine the data for both artists into a single data frame
+combined_data <- rbind(kygo_features, avicii_features)
+```
+
+```{r, echo=FALSE}
+# Create a matrix with the data
+data <- matrix(NA, nrow = 5, ncol = 2, dimnames = list(c("Number of songs", "Average duration (in seconds)", "Oldest song", "Newest song", "Most streamed song"), c("Avicii", "Kygo")))
+
+data[,1] <- c(49, (mean(avicii_features$track.duration_ms)/1000), "Levels (2011)", "Forever yours (Avicii Tribute) (2020)", "Wake Me Up")
+data[,2] <- c(77, (mean(kygo_features$track.duration_ms)/1000), "Epsilon (2013)", "Whatever (2024)", "It Ain't Me")
+
+# Print the data
+print(data)
+```
+### Energy
+<div class="myDiv">
+```{r, echo = FALSE}
+# Plotting
+ggplot(combined_data, aes(x = artist, y = energy, fill = artist)) +
+  geom_boxplot(position = position_dodge(width = 0.8)) +
+  labs(title = "Comparison of energy between Kygo and Avicii",
+       x = "Artist",
+       y = "Energy") +
+  theme_minimal()
+```
+</div>
+### Danceability
+<div class="myDiv">
+```{r, echo = FALSE}
+ggplot(combined_data, aes(x = artist, y = danceability, fill = artist)) +
+  geom_boxplot(position = position_dodge(width = 0.8)) +
+  labs(title = "Comparison of danceability between Kygo and Avicii",
+       x = "Artist",
+       y = "Danceability") +
+  theme_minimal()
+```
+</div>
+### Acousticness
+<div class="myDiv">
+```{r, echo = FALSE}
+ggplot(combined_data, aes(x = artist, y = acousticness, fill = artist)) +
+  geom_boxplot(position = position_dodge(width = 0.8)) +
+  labs(title = "Comparison of acousticness between Kygo and Avicii",
+       x = "Artist",
+       y = "Acousticness") +
+  theme_minimal()
+```
+</div>
+
+### Tempo
+<div class="myDiv">
+```{r, echo = FALSE}
+
+# Plotting
+ggplot(combined_data, aes(x = artist, y = tempo, fill = artist)) +
+  geom_boxplot(position = position_dodge(width = 0.8)) +
+  labs(title = "Comparison of tempo between Kygo and Avicii",
+       x = "Artist",
+       y = "Tempo") +
+  theme_minimal()
+```
+</div>
+
+### Valence
+<div class="myDiv">
+```{r, echo = FALSE}
+
+# Plotting
+ggplot(combined_data, aes(x = artist, y = valence, fill = artist)) +
+  geom_boxplot(position = position_dodge(width = 0.8)) +
+  labs(title = "Comparison of valence between Kygo and Avicii",
+       x = "Artist",
+       y = "Valence") +
+  theme_minimal()
+```
+</div>
+
+
+Over the years
+=====================================
+Column {data-width=333}
+-----------------------------------------------------------------------
+
+### About the plots
+To see the change of the two artists over time, it is necessary to include the years. One way to do this is to look at each album to see how this music differs from an album released later. This is done on the right for Avicii (left) and Kygo (right). Note that a flaw in this method is the exclusion of songs that are not covered by an album. In these plots, we can see the valence from 0 to 1 on the x-axis, the energy from 0 to 1 on the y-axis, the size of the bubbles indicate the popularity of the track and the color of the bubbles indicate the danceability (the brighter, the higher, the darker, the lower). <br>
+<br>
+As for Avicii, you can see that almost all the songs are in the upper left box (low valence, high energy). His most streamed song does not fall into this. If we then look at his second album, we can see that just over half are in the upper right box (high valence, high energy). This looks like an upward trend in valence, but the third album tends to return to the statistics of the first album. Namely, here the vast majority are in the upper left box (low valence, high energy). It is important to keep in mind that Avicii passed away in 2018, while the album came out in 2019. Therefore, it is possible that his management have continued with older works from years ago, which could explain the change back in his music style. <br>
+<br>
+On the right we have the music of Kygo. In his first album, we again see that the busiest section is the upper left (low valence, high energy) section. The outliers are now in the lower left (low valence, low energy). One of them is the song "Intro," which is not very representative of the album. In the next album, the average shifts a bit to the right with some songs in the upper right box (high valence, high energy). Then, in the third album, we can see a clear group of bubbles in the upper left box again (low valence, high energy), with some bubbles scattered around it. In the last album, we can see a somewhat similar shape, but with a lower average enegry level. Note that the bubbles in the last plot are pretty big on average. <br>
+<br>
+We can conclude that for both Avicii as Kygo, there is not a clear trend that follows through the years, based on these plots. There are for both of them changes in different albums, but we can not really make a conclusion of a clear change. These plots are, however, really interesting to see in my opinion.
+
+Column {.tabset}
+-----------------------------------------------------------------------
+
+### True (2013)
+```{r, echo=FALSE}
+true <- get_playlist_audio_features("", "3Y2rVF2ky9L9xqcO8oYik7")
+
+february_dip <-
+  true |>
+  ggplot(                          # Set up the plot.
+    aes(
+      x = valence,
+      y = energy,
+      size = track.popularity,
+      colour = danceability,
+      label = track.name           # Labels will be interactively visible.
+    )
+  ) +
+  geom_point() +                   # Scatter plot.
+  geom_rug(size = 0.1) +           # Add 'fringes' to show data distribution.
+  scale_x_continuous(              # Fine-tune the x axis.
+    limits = c(0, 1),
+    breaks = c(0, 0.50, 1),        # Use grid-lines for quadrants only.
+    minor_breaks = NULL            # Remove 'minor' grid-lines.
+  ) +
+  scale_y_continuous(              # Fine-tune the y axis in the same way.
+    limits = c(0, 1),
+    breaks = c(0, 0.50, 1),
+    minor_breaks = NULL
+  ) +
+  scale_colour_viridis_c(          # Use the cividis palette
+    option = "E",                  # Qualitative set.
+    alpha = 0.8,                   # Include some transparency
+    guide = "none"
+  ) +
+  scale_size_continuous(           # Fine-tune the sizes of each point.
+    guide = "none"                 # Remove the legend for size.
+  ) +
+  theme_light() +                  # Use a simpler theme.
+  labs(                            # Make the titles nice.
+    x = "Valence",
+    y = "Energy"
+  )
+
+ggplotly(february_dip)
+```
+
+### Stories (2015)
+```{r, echo=FALSE}
+true <- get_playlist_audio_features("", "7zGYoY00DKeIdQEnfeXS3F")
+
+february_dip <-
+  true |>
+  ggplot(                          # Set up the plot.
+    aes(
+      x = valence,
+      y = energy,
+      size = track.popularity,
+      colour = danceability,
+      label = track.name           # Labels will be interactively visible.
+    )
+  ) +
+  geom_point() +                   # Scatter plot.
+  geom_rug(size = 0.1) +           # Add 'fringes' to show data distribution.
+  scale_x_continuous(              # Fine-tune the x axis.
+    limits = c(0, 1),
+    breaks = c(0, 0.50, 1),        # Use grid-lines for quadrants only.
+    minor_breaks = NULL            # Remove 'minor' grid-lines.
+  ) +
+  scale_y_continuous(              # Fine-tune the y axis in the same way.
+    limits = c(0, 1),
+    breaks = c(0, 0.50, 1),
+    minor_breaks = NULL
+  ) +
+  scale_colour_viridis_c(          # Use the cividis palette
+    option = "E",                  # Qualitative set.
+    alpha = 0.8,                   # Include some transparency
+    guide = "none"
+  ) +
+  scale_size_continuous(           # Fine-tune the sizes of each point.
+    guide = "none"                 # Remove the legend for size.
+  ) +
+  theme_light() +                  # Use a simpler theme.
+  labs(                            # Make the titles nice.
+    x = "Valence",
+    y = "Energy"
+  )
+
+ggplotly(february_dip)
+```
+
+### TIM (2019)
+```{r, echo=FALSE}
+true <- get_playlist_audio_features("", "0Ae6XRwFrB0O2WQrgHn1q4")
+
+february_dip <-
+  true |>
+  ggplot(                          # Set up the plot.
+    aes(
+      x = valence,
+      y = energy,
+      size = track.popularity,
+      colour = danceability,
+      label = track.name           # Labels will be interactively visible.
+    )
+  ) +
+  geom_point() +                   # Scatter plot.
+  geom_rug(size = 0.1) +           # Add 'fringes' to show data distribution.
+  scale_x_continuous(              # Fine-tune the x axis.
+    limits = c(0, 1),
+    breaks = c(0, 0.50, 1),        # Use grid-lines for quadrants only.
+    minor_breaks = NULL            # Remove 'minor' grid-lines.
+  ) +
+  scale_y_continuous(              # Fine-tune the y axis in the same way.
+    limits = c(0, 1),
+    breaks = c(0, 0.50, 1),
+    minor_breaks = NULL
+  ) +
+  scale_colour_viridis_c(          # Use the cividis palette
+    option = "E",                  # Qualitative set.
+    alpha = 0.8,                   # Include some transparency
+    guide = "none"
+  ) +
+  scale_size_continuous(           # Fine-tune the sizes of each point.
+    guide = "none"                 # Remove the legend for size.
+  ) +
+  theme_light() +                  # Use a simpler theme.
+  labs(                            # Make the titles nice.
+    x = "Valence",
+    y = "Energy"
+  )
+
+ggplotly(february_dip)
+```
+
+Column {.tabset}
+-----------------------------------------------------------------------
+
+### Cloud Nine (2016)
+```{r, echo=FALSE}
+true <- get_playlist_audio_features("", "3tiuQfPQqjq5Dgwlw1hriv")
+
+february_dip <-
+  true |>
+  ggplot(                          # Set up the plot.
+    aes(
+      x = valence,
+      y = energy,
+      size = track.popularity,
+      colour = danceability,
+      label = track.name           # Labels will be interactively visible.
+    )
+  ) +
+  geom_point() +                   # Scatter plot.
+  geom_rug(size = 0.1) +           # Add 'fringes' to show data distribution.
+  scale_x_continuous(              # Fine-tune the x axis.
+    limits = c(0, 1),
+    breaks = c(0, 0.50, 1),        # Use grid-lines for quadrants only.
+    minor_breaks = NULL            # Remove 'minor' grid-lines.
+  ) +
+  scale_y_continuous(              # Fine-tune the y axis in the same way.
+    limits = c(0, 1),
+    breaks = c(0, 0.50, 1),
+    minor_breaks = NULL
+  ) +
+  scale_colour_viridis_c(          # Use the cividis palette
+    option = "E",                  # Qualitative set.
+    alpha = 0.8,                   # Include some transparency
+    guide = "none"
+  ) +
+  scale_size_continuous(           # Fine-tune the sizes of each point.
+    guide = "none"                 # Remove the legend for size.
+  ) +
+  theme_light() +                  # Use a simpler theme.
+  labs(                            # Make the titles nice.
+    x = "Valence",
+    y = "Energy"
+  )
+
+ggplotly(february_dip)
+```
+
+### Kids in Love (2017)
+```{r, echo=FALSE}
+true <- get_playlist_audio_features("", "5N6W5V6TUzpzaoZONK4fhh")
+
+february_dip <-
+  true |>
+  ggplot(                          # Set up the plot.
+    aes(
+      x = valence,
+      y = energy,
+      size = track.popularity,
+      colour = danceability,
+      label = track.name           # Labels will be interactively visible.
+    )
+  ) +
+  geom_point() +                   # Scatter plot.
+  geom_rug(size = 0.1) +           # Add 'fringes' to show data distribution.
+  scale_x_continuous(              # Fine-tune the x axis.
+    limits = c(0, 1),
+    breaks = c(0, 0.50, 1),        # Use grid-lines for quadrants only.
+    minor_breaks = NULL            # Remove 'minor' grid-lines.
+  ) +
+  scale_y_continuous(              # Fine-tune the y axis in the same way.
+    limits = c(0, 1),
+    breaks = c(0, 0.50, 1),
+    minor_breaks = NULL
+  ) +
+  scale_colour_viridis_c(          # Use the cividis palette
+    option = "E",                  # Qualitative set.
+    alpha = 0.8,                   # Include some transparency
+    guide = "none"
+  ) +
+  scale_size_continuous(           # Fine-tune the sizes of each point.
+    guide = "none"                 # Remove the legend for size.
+  ) +
+  theme_light() +                  # Use a simpler theme.
+  labs(                            # Make the titles nice.
+    x = "Valence",
+    y = "Energy"
+  )
+
+ggplotly(february_dip)
+```
+
+### Golden Hour (2020)
+```{r, echo=FALSE}
+true <- get_playlist_audio_features("", "7jBq2UOcwdOXOilAurUOwz")
+
+february_dip <-
+  true |>
+  ggplot(                          # Set up the plot.
+    aes(
+      x = valence,
+      y = energy,
+      size = track.popularity,
+      colour = danceability,
+      label = track.name           # Labels will be interactively visible.
+    )
+  ) +
+  geom_point() +                   # Scatter plot.
+  geom_rug(size = 0.1) +           # Add 'fringes' to show data distribution.
+  scale_x_continuous(              # Fine-tune the x axis.
+    limits = c(0, 1),
+    breaks = c(0, 0.50, 1),        # Use grid-lines for quadrants only.
+    minor_breaks = NULL            # Remove 'minor' grid-lines.
+  ) +
+  scale_y_continuous(              # Fine-tune the y axis in the same way.
+    limits = c(0, 1),
+    breaks = c(0, 0.50, 1),
+    minor_breaks = NULL
+  ) +
+  scale_colour_viridis_c(          # Use the cividis palette
+    option = "E",                  # Qualitative set.
+    alpha = 0.8,                   # Include some transparency
+    guide = "none"
+  ) +
+  scale_size_continuous(           # Fine-tune the sizes of each point.
+    guide = "none"                 # Remove the legend for size.
+  ) +
+  theme_light() +                  # Use a simpler theme.
+  labs(                            # Make the titles nice.
+    x = "Valence",
+    y = "Energy"
+  )
+
+ggplotly(february_dip)
+```
+
+### Thrill Of The Chase (2022)
+```{r, echo=FALSE}
+true <- get_playlist_audio_features("", "3JVSyIGjpIN74gX9HHcote")
+
+february_dip <-
+  true |>
+  ggplot(                          # Set up the plot.
+    aes(
+      x = valence,
+      y = energy,
+      size = track.popularity,
+      colour = danceability,
+      label = track.name           # Labels will be interactively visible.
+    )
+  ) +
+  geom_point() +                   # Scatter plot.
+  geom_rug(size = 0.1) +           # Add 'fringes' to show data distribution.
+  scale_x_continuous(              # Fine-tune the x axis.
+    limits = c(0, 1),
+    breaks = c(0, 0.50, 1),        # Use grid-lines for quadrants only.
+    minor_breaks = NULL            # Remove 'minor' grid-lines.
+  ) +
+  scale_y_continuous(              # Fine-tune the y axis in the same way.
+    limits = c(0, 1),
+    breaks = c(0, 0.50, 1),
+    minor_breaks = NULL
+  ) +
+  scale_colour_viridis_c(          # Use the cividis palette
+    option = "E",                  # Qualitative set.
+    alpha = 0.8,                   # Include some transparency
+    guide = "none"
+  ) +
+  scale_size_continuous(           # Fine-tune the sizes of each point.
+    guide = "none"                 # Remove the legend for size.
+  ) +
+  theme_light() +                  # Use a simpler theme.
+  labs(                            # Make the titles nice.
+    x = "Valence",
+    y = "Energy"
+  )
+
+ggplotly(february_dip)
+```
+
+
+Self-similarity matrices
+=====================================
+Column {data-width=333}
+-----------------------------------------------------------------------
+
+### About the plots
+On the right, we have eight plots. Each song has one chroma-based and one timbre-based self-similarity matrix. We can see these SSMs of 'Hey Brother' and 'SOS' from Avicii and 'Firestone' and 'Higher Love' from Kygo (songs can be heard with the displays below). These songs were chosen because their popularity is not low, which makes them sufficiently representative. In addition, the release dates are relatively far apart to allow any differences to be seen.  <br>
+<br>
+If we compare the two songs of Avicii, we can see the same parallel diagonal lines in the four plots, but the timbre-based SSM seems more 'blurry' and the chroma-based SSM has more tiny yellow blocks in it. <br>
+<br>
+The plots of Kygo does not seem to have those parralel diagonal lines, but they do have a clear structure, which can be seen in both his songs. This structure resembles the one in 'Hey Brother'. <br>
+```{=html}
+<iframe style="border-radius:20px"
+src="https://open.spotify.com/embed/track/4lhqb6JvbHId48OUJGwymk" width="100%" height="150" frameBorder="0" allowtransparency="false" allow="encrypted-media" data-external="1"></iframe>
+
+<iframe style="border-radius:20px"
+src="https://open.spotify.com/embed/track/2x0RZdkZcD8QRI53XT4GI5" width="100%" height="150" frameBorder="0" allowtransparency="false" allow="encrypted-media" data-external="1"></iframe>
+
+<iframe style="border-radius:20px"
+src="https://open.spotify.com/embed/track/1I8tHoNBFTuoJAlh4hfVVE" width="100%" height="150" frameBorder="0" allowtransparency="false" allow="encrypted-media" data-external="1"></iframe>
+
+<iframe style="border-radius:20px"
+src="https://open.spotify.com/embed/track/6oJ6le65B3SEqPwMRNXWjY" width="100%" height="150" frameBorder="0" allowtransparency="false" allow="encrypted-media" data-external="1"></iframe>
+```
+
+Column {.tabset}
+-----------------------------------------------------------------------
+### Hey Brother (2013)
+<div class="myDiv">
+```{r, echo=FALSE}
+# Retrieve audio features for a single track from Spotify
+track_id_hey_brother <- "4lhqb6JvbHId48OUJGwymk" # Hey Brother
+```
+```{r echo=FALSE}
+bzt <-
+  get_tidy_audio_analysis("4lhqb6JvbHId48OUJGwymk") |>
+  compmus_align(bars, segments) |>
+  select(bars) |>
+  unnest(bars) |>
+  mutate(
+    pitches =
+      map(segments,
+        compmus_summarise, pitches,
+        method = "acentre", norm = "manhattan"
+      )
+  ) |>
+  mutate(
+    timbre =
+      map(segments,
+        compmus_summarise, timbre,
+        method = "mean"
+      )
+  )
+bind_rows(
+  bzt |> 
+    compmus_self_similarity(pitches, "aitchison") |> 
+    mutate(d = d / max(d), type = "Chroma"),
+  bzt |> 
+    compmus_self_similarity(timbre, "euclidean") |> 
+    mutate(d = d / max(d), type = "Timbre")
+) |>
+  mutate() |> 
+  ggplot(
+    aes(
+      x = xstart + xduration / 2,
+      width = xduration,
+      y = ystart + yduration / 2,
+      height = yduration,
+      fill = d
+    )
+  ) +
+  geom_tile() +
+  coord_fixed() +
+  facet_wrap(~type) +
+  scale_fill_viridis_c(option = "E", guide = "none") +
+  theme_classic() + ggtitle("Self-similarity matrices of 'Hey Brother'") +
+  labs(x = "", y = "")
+```
+</div>
+
+### SOS (2019)
+<div class="myDiv">
+```{r, echo=FALSE}
+# Retrieve audio features for a single track from Spotify
+track_id_sos <- "2x0RZdkZcD8QRI53XT4GI5" # SOS
+```
+
+```{r echo=FALSE}
+bzt <-
+  get_tidy_audio_analysis("2x0RZdkZcD8QRI53XT4GI5") |>
+  compmus_align(bars, segments) |>
+  select(bars) |>
+  unnest(bars) |>
+  mutate(
+    pitches =
+      map(segments,
+        compmus_summarise, pitches,
+        method = "acentre", norm = "manhattan"
+      )
+  ) |>
+  mutate(
+    timbre =
+      map(segments,
+        compmus_summarise, timbre,
+        method = "mean"
+      )
+  )
+bind_rows(
+  bzt |> 
+    compmus_self_similarity(pitches, "aitchison") |> 
+    mutate(d = d / max(d), type = "Chroma"),
+  bzt |> 
+    compmus_self_similarity(timbre, "euclidean") |> 
+    mutate(d = d / max(d), type = "Timbre")
+) |>
+  mutate() |> 
+  ggplot(
+    aes(
+      x = xstart + xduration / 2,
+      width = xduration,
+      y = ystart + yduration / 2,
+      height = yduration,
+      fill = d
+    )
+  ) +
+  geom_tile() +
+  coord_fixed() +
+  facet_wrap(~type) +
+  scale_fill_viridis_c(option = "E", guide = "none") +
+  theme_classic() + ggtitle("Self-similarity matrices of 'SOS'") +
+  labs(x = "", y = "")
+```
+</div>
+
+Column {.tabset}
+-----------------------------------------------------------------------
+### Firestone (2014)
+<div class="myDiv">
+```{r, echo=FALSE}
+# Retrieve audio features for a single track from Spotify
+track_id_firestone <- "1I8tHoNBFTuoJAlh4hfVVE" # Firestone
+```
+```{r echo=FALSE}
+bzt <-
+  get_tidy_audio_analysis("1I8tHoNBFTuoJAlh4hfVVE") |>
+  compmus_align(bars, segments) |>
+  select(bars) |>
+  unnest(bars) |>
+  mutate(
+    pitches =
+      map(segments,
+        compmus_summarise, pitches,
+        method = "acentre", norm = "manhattan"
+      )
+  ) |>
+  mutate(
+    timbre =
+      map(segments,
+        compmus_summarise, timbre,
+        method = "mean"
+      )
+  )
+bind_rows(
+  bzt |> 
+    compmus_self_similarity(pitches, "aitchison") |> 
+    mutate(d = d / max(d), type = "Chroma"),
+  bzt |> 
+    compmus_self_similarity(timbre, "euclidean") |> 
+    mutate(d = d / max(d), type = "Timbre")
+) |>
+  mutate() |> 
+  ggplot(
+    aes(
+      x = xstart + xduration / 2,
+      width = xduration,
+      y = ystart + yduration / 2,
+      height = yduration,
+      fill = d
+    )
+  ) +
+  geom_tile() +
+  coord_fixed() +
+  facet_wrap(~type) +
+  scale_fill_viridis_c(option = "E", guide = "none") +
+  theme_classic() + ggtitle("Self-similarity matrices of 'Firestone'") +
+  labs(x = "", y = "")
+```
+</div>
+
+### Higher Love (2019)
+<div class="myDiv">
+```{r, echo=FALSE}
+# Retrieve audio features for a single track from Spotify
+track_id_higher_love <- "6oJ6le65B3SEqPwMRNXWjY" # Higher Love
+```
+```{r echo=FALSE}
+bzt <-
+  get_tidy_audio_analysis("6oJ6le65B3SEqPwMRNXWjY") |>
+  compmus_align(bars, segments) |>
+  select(bars) |>
+  unnest(bars) |>
+  mutate(
+    pitches =
+      map(segments,
+        compmus_summarise, pitches,
+        method = "acentre", norm = "manhattan"
+      )
+  ) |>
+  mutate(
+    timbre =
+      map(segments,
+        compmus_summarise, timbre,
+        method = "mean"
+      )
+  )
+bind_rows(
+  bzt |> 
+    compmus_self_similarity(pitches, "aitchison") |> 
+    mutate(d = d / max(d), type = "Chroma"),
+  bzt |> 
+    compmus_self_similarity(timbre, "euclidean") |> 
+    mutate(d = d / max(d), type = "Timbre")
+) |>
+  mutate() |> 
+  ggplot(
+    aes(
+      x = xstart + xduration / 2,
+      width = xduration,
+      y = ystart + yduration / 2,
+      height = yduration,
+      fill = d
+    )
+  ) +
+  geom_tile() +
+  coord_fixed() +
+  facet_wrap(~type) +
+  scale_fill_viridis_c(option = "E", guide = "none") +
+  theme_classic() + ggtitle("Self-similarity matrices of 'Higher Love'") +
+  labs(x = "", y = "")
+```
+</div>
+
+Chordograms
+=====================================
+Column {data-width=333}
+-----------------------------------------------------------------------
+### About the plots
+In this section, we have some chordograms of both artists. Again, the songs are picked on popularity and release year and can be heard down below. <br>
+<br>
+We can see that the plots all pretty much differ. While 'Silhouettes' has a bright ending, 'The Nights' and 'Raging' has some parts where multiple chords are bright, while 'Love Me Now' has a lot of them. All of these plots are made with the same method, so we can conclude that the brighter plots have more variety in chords. The recurring strips in the plots could be related to build up to a drop or the drop itself. 
+```{=html}
+<iframe style="border-radius:20px"
+src="https://open.spotify.com/embed/track/0bLPAuVTardAaPBcoQOQJG" width="100%" height="150" frameBorder="0" allowtransparency="false" allow="encrypted-media" data-external="1"></iframe>
+
+<iframe style="border-radius:20px"
+src="https://open.spotify.com/embed/track/0ct6r3EGTcMLPtrXHDvVjc" width="100%" height="150" frameBorder="0" allowtransparency="false" allow="encrypted-media" data-external="1"></iframe>
+
+<iframe style="border-radius:20px"
+src="https://open.spotify.com/embed/track/2Vhd5uZB4brKHmM0MNxkZo" width="100%" height="150" frameBorder="0" allowtransparency="false" allow="encrypted-media" data-external="1"></iframe>
+
+<iframe style="border-radius:20px"
+src="https://open.spotify.com/embed/track/1c1sdxrYLIiuJOlE7PPttb" width="100%" height="150" frameBorder="0" allowtransparency="false" allow="encrypted-media" data-external="1"></iframe>
+```
+
+Column {.tabset}
+-----------------------------------------------------------------------
+```{r, echo=FALSE}
+circshift <- function(v, n) {
+  if (n == 0) v else c(tail(v, n), head(v, -n))
+}
+
+#      C     C#    D     Eb    E     F     F#    G     Ab    A     Bb    B
+major_chord <-
+  c(   1,    0,    0,    0,    1,    0,    0,    1,    0,    0,    0,    0)
+minor_chord <-
+  c(   1,    0,    0,    1,    0,    0,    0,    1,    0,    0,    0,    0)
+seventh_chord <-
+  c(   1,    0,    0,    0,    1,    0,    0,    1,    0,    0,    1,    0)
+
+major_key <-
+  c(6.35, 2.23, 3.48, 2.33, 4.38, 4.09, 2.52, 5.19, 2.39, 3.66, 2.29, 2.88)
+minor_key <-
+  c(6.33, 2.68, 3.52, 5.38, 2.60, 3.53, 2.54, 4.75, 3.98, 2.69, 3.34, 3.17)
+
+chord_templates <-
+  tribble(
+    ~name, ~template,
+    "Gb:7", circshift(seventh_chord, 6),
+    "Gb:maj", circshift(major_chord, 6),
+    "Bb:min", circshift(minor_chord, 10),
+    "Db:maj", circshift(major_chord, 1),
+    "F:min", circshift(minor_chord, 5),
+    "Ab:7", circshift(seventh_chord, 8),
+    "Ab:maj", circshift(major_chord, 8),
+    "C:min", circshift(minor_chord, 0),
+    "Eb:7", circshift(seventh_chord, 3),
+    "Eb:maj", circshift(major_chord, 3),
+    "G:min", circshift(minor_chord, 7),
+    "Bb:7", circshift(seventh_chord, 10),
+    "Bb:maj", circshift(major_chord, 10),
+    "D:min", circshift(minor_chord, 2),
+    "F:7", circshift(seventh_chord, 5),
+    "F:maj", circshift(major_chord, 5),
+    "A:min", circshift(minor_chord, 9),
+    "C:7", circshift(seventh_chord, 0),
+    "C:maj", circshift(major_chord, 0),
+    "E:min", circshift(minor_chord, 4),
+    "G:7", circshift(seventh_chord, 7),
+    "G:maj", circshift(major_chord, 7),
+    "B:min", circshift(minor_chord, 11),
+    "D:7", circshift(seventh_chord, 2),
+    "D:maj", circshift(major_chord, 2),
+    "F#:min", circshift(minor_chord, 6),
+    "A:7", circshift(seventh_chord, 9),
+    "A:maj", circshift(major_chord, 9),
+    "C#:min", circshift(minor_chord, 1),
+    "E:7", circshift(seventh_chord, 4),
+    "E:maj", circshift(major_chord, 4),
+    "G#:min", circshift(minor_chord, 8),
+    "B:7", circshift(seventh_chord, 11),
+    "B:maj", circshift(major_chord, 11),
+    "D#:min", circshift(minor_chord, 3)
+  )
+
+key_templates <-
+  tribble(
+    ~name, ~template,
+    "Gb:maj", circshift(major_key, 6),
+    "Bb:min", circshift(minor_key, 10),
+    "Db:maj", circshift(major_key, 1),
+    "F:min", circshift(minor_key, 5),
+    "Ab:maj", circshift(major_key, 8),
+    "C:min", circshift(minor_key, 0),
+    "Eb:maj", circshift(major_key, 3),
+    "G:min", circshift(minor_key, 7),
+    "Bb:maj", circshift(major_key, 10),
+    "D:min", circshift(minor_key, 2),
+    "F:maj", circshift(major_key, 5),
+    "A:min", circshift(minor_key, 9),
+    "C:maj", circshift(major_key, 0),
+    "E:min", circshift(minor_key, 4),
+    "G:maj", circshift(major_key, 7),
+    "B:min", circshift(minor_key, 11),
+    "D:maj", circshift(major_key, 2),
+    "F#:min", circshift(minor_key, 6),
+    "A:maj", circshift(major_key, 9),
+    "C#:min", circshift(minor_key, 1),
+    "E:maj", circshift(major_key, 4),
+    "G#:min", circshift(minor_key, 8),
+    "B:maj", circshift(major_key, 11),
+    "D#:min", circshift(minor_key, 3)
+  )
+
+```
+
+### Silhouettes (2012)
+<div class="myDiv">
+```{r, echo=FALSE}
+twenty_five <-
+  get_tidy_audio_analysis("0bLPAuVTardAaPBcoQOQJG") |> # Silhouettes
+  compmus_align(sections, segments) |>
+  select(sections) |>
+  unnest(sections) |>
+  mutate(
+    pitches =
+      map(segments,
+        compmus_summarise, pitches,
+        method = "mean", norm = "manhattan"
+      )
+  )
+
+twenty_five |> 
+  compmus_match_pitch_template(
+    key_templates,         # Change to chord_templates if descired
+    method = "manhattan",  # Try different distance metrics
+    norm = "euclidean"     # Try different norms
+  ) |>
+  ggplot(
+    aes(x = start + duration / 2, width = duration, y = name, fill = d)
+  ) +
+  geom_tile() +
+  scale_fill_viridis_c(guide = "none") +
+  theme_minimal() +
+  labs(x = "Time (s)", y = "") + ggtitle("Chordogram of 'Silhouettes'")
+```
+</div>
+
+### The Nights (2014)
+<div class="myDiv">
+```{r, echo=FALSE}
+twenty_five <-
+  get_tidy_audio_analysis("0ct6r3EGTcMLPtrXHDvVjc") |> # The Nights
+  compmus_align(sections, segments) |>
+  select(sections) |>
+  unnest(sections) |>
+  mutate(
+    pitches =
+      map(segments,
+        compmus_summarise, pitches,
+        method = "mean", norm = "manhattan"
+      )
+  )
+
+twenty_five |> 
+  compmus_match_pitch_template(
+    key_templates,         # Change to chord_templates if descired
+    method = "manhattan",  # Try different distance metrics
+    norm = "euclidean"     # Try different norms
+  ) |>
+  ggplot(
+    aes(x = start + duration / 2, width = duration, y = name, fill = d)
+  ) +
+  geom_tile() +
+  scale_fill_viridis_c(guide = "none") +
+  theme_minimal() +
+  labs(x = "Time (s)", y = "") + ggtitle("Chordogram of 'The Nights'")
+```
+</div>
+Column {.tabset}
+-----------------------------------------------------------------------
+### Raging (2016) 
+<div class="myDiv">
+```{r, echo=FALSE}
+twenty_five <-
+  get_tidy_audio_analysis("2Vhd5uZB4brKHmM0MNxkZo") |> # Raging
+  compmus_align(sections, segments) |>
+  select(sections) |>
+  unnest(sections) |>
+  mutate(
+    pitches =
+      map(segments,
+        compmus_summarise, pitches,
+        method = "mean", norm = "manhattan"
+      )
+  )
+
+twenty_five |> 
+  compmus_match_pitch_template(
+    key_templates,         # Change to chord_templates if descired
+    method = "manhattan",  # Try different distance metrics
+    norm = "euclidean"     # Try different norms
+  ) |>
+  ggplot(
+    aes(x = start + duration / 2, width = duration, y = name, fill = d)
+  ) +
+  geom_tile() +
+  scale_fill_viridis_c(guide = "none") +
+  theme_minimal() +
+  labs(x = "Time (s)", y = "") + ggtitle("Chordogram of 'Raging'")
+```
+</div>
+
+### Love Me Now (2022)
+<div class="myDiv">
+```{r, echo=FALSE}
+twenty_five <-
+  get_tidy_audio_analysis("1c1sdxrYLIiuJOlE7PPttb") |> # Love me now
+  compmus_align(sections, segments) |>
+  select(sections) |>
+  unnest(sections) |>
+  mutate(
+    pitches =
+      map(segments,
+        compmus_summarise, pitches,
+        method = "mean", norm = "manhattan"
+      )
+  )
+
+twenty_five |> 
+  compmus_match_pitch_template(
+    key_templates,         # Change to chord_templates if descired
+    method = "manhattan",  # Try different distance metrics
+    norm = "euclidean"     # Try different norms
+  ) |>
+  ggplot(
+    aes(x = start + duration / 2, width = duration, y = name, fill = d)
+  ) +
+  geom_tile() +
+  scale_fill_viridis_c(guide = "none") +
+  theme_minimal() +
+  labs(x = "Time (s)", y = "") + ggtitle("Chordogram of 'Love Me Now'")
+```
+</div>
+
+Novelty functions
+=====================================
+
+Column {data-width=500}
+-----------------------------------------------------------------------
+### About the plots
+On the right, there are two 'novelty-grams'. One of Avicii's 'You make me' and the other is Kygo's 'Stargazing. I set the time to 110 sec, because that is the part after the first drop for both songs.Here you can see that the start of Stargazing is calm compared to You make me. Also, the line of Stargazing is moving somewhat more, whereas the average line of You make me would be more straight. To be honest, I expected more differences, because the songs do differ a lot in tempo and energy.<br>
+<br>
+Note: I wanted to make a tempogram of the songs, but I kept getting an error, where I had to restart the kernel and I do not know why this is the case. I got some tips and help, but it still would not work :(.
+<br>
+```{=html}
+<iframe style="border-radius:20px"
+src="https://open.spotify.com/embed/track/52RK8UVEDgUAgpecOpTQM3" width="100%" height="150" frameBorder="0" allowtransparency="false" allow="encrypted-media" data-external="1"></iframe>
+```
+```{=html}
+<iframe style="border-radius:20px"
+src="https://open.spotify.com/embed/track/0Zbbxnx4SGGHoIow4PpISP" width="100%" height="150" frameBorder="0" allowtransparency="false" allow="encrypted-media" data-external="1"></iframe>
+```
+
+Column {.tabset}
+-----------------------------------------------------------------------
+### You make me - Avicii
+<div class="myDiv">
+```{r, echo=FALSE}
+pata_pata <-
+  get_tidy_audio_analysis("52RK8UVEDgUAgpecOpTQM3") |>
+  select(segments) |>
+  unnest(segments)
+pata_pata |>
+  arrange(start) |>
+  mutate(timbre = map2(timbre, lag(timbre), `-`)) |>
+  slice(-1) |>
+  compmus_gather_timbre() |>
+  group_by(start, duration) |> 
+  summarise(novelty = sum(log1p(pmax(value, 0)))) |> 
+  ggplot(aes(x = start + duration / 2, y = novelty)) +
+  geom_line() +
+  xlim(0, 110) +
+  theme_minimal() +
+  labs(x = "Time (s)", y = "Novelty")
+```
+</div>
+
+### Stargazing - Kygo
+<div class="myDiv">
+```{r, echo=FALSE}
+pata_pata <-
+  get_tidy_audio_analysis("0Zbbxnx4SGGHoIow4PpISP") |>
+  select(segments) |>
+  unnest(segments)
+pata_pata |>
+  arrange(start) |>
+  mutate(timbre = map2(timbre, lag(timbre), `-`)) |>
+  slice(-1) |>
+  compmus_gather_timbre() |>
+  group_by(start, duration) |> 
+  summarise(novelty = sum(log1p(pmax(value, 0)))) |> 
+  ggplot(aes(x = start + duration / 2, y = novelty)) +
+  geom_line() +
+  xlim(0, 110) +
+  theme_minimal() +
+  labs(x = "Time (s)", y = "Novelty")
+```
+</div>
+
+
+Clustering
+=====================================
+
+Column {data-width=500}
+-----------------------------------------------------------------------
+### About the plots
+The plots on the right show the clusters of the two playlists of Avicii's music and Kygo's. This shows which songs are very different from each other, where they converge high up in the tree and which are similar, where they converge low in the tree. <br>
+<br>
+Interesting findings in Avicii's tree is that 'Superlove' is very different from all the other songs. The same goes for 'Somewhere in Stockholm'. In addition, you notice (if you know the songs) that songs from the same album are not necessarily close to each other. <br>
+<br>
+As for Kygo's tree, similar points can be seen. 'Intro' is very different from all the other songs. This is to be expected because it is a very different song with also a different purpose in the album. In addition, again, there is no relationship between songs in the same album and close to each other.  <br>
+<br>
+Note: Especially with Kygo's plot, there are just too many songs to keep it clear. If you know the names, you can probably distinguish all the songs. Next to that, I personally find it a lot more interesting if all the songs are in the tree, instead of clustering per album. That is why I chose to keep it this way. 
+
+Column {.tabset}
+-----------------------------------------------------------------------
+### Avicii (Hierarchical cluster)
+<div class="myDiv">
+```{r, echo=FALSE}
+get_conf_mat <- function(fit) {
+  outcome <- .get_tune_outcome_names(fit)
+  fit |> 
+    collect_predictions() |> 
+    conf_mat(truth = outcome, estimate = .pred_class)
+}  
+
+get_pr <- function(fit) {
+  fit |> 
+    conf_mat_resampled() |> 
+    group_by(Prediction) |> mutate(precision = Freq / sum(Freq)) |> 
+    group_by(Truth) |> mutate(recall = Freq / sum(Freq)) |> 
+    ungroup() |> filter(Prediction == Truth) |> 
+    select(class = Prediction, precision, recall)
+}
+
+```
+```{r, echo=FALSE}
+clus <-
+  get_playlist_audio_features("", "3ucGSj6sO3iLaQin2jfyQh") |>
+  add_audio_analysis() |>
+  mutate(
+    segments = map2(segments, key, compmus_c_transpose),
+    pitches =
+      map(segments,
+          compmus_summarise, pitches,
+          method = "mean", norm = "manhattan"
+      ),
+    timbre =
+      map(
+        segments,
+        compmus_summarise, timbre,
+        method = "mean"
+      )
+  ) |>
+  mutate(pitches = map(pitches, compmus_normalise, "clr")) |>
+  mutate_at(vars(pitches, timbre), map, bind_rows) |>
+  unnest(cols = c(pitches, timbre))
+
+clus_av_juice <-
+  recipe(
+    track.name ~
+      danceability +
+      energy +
+      loudness +
+      speechiness +
+      acousticness +
+      instrumentalness +
+      liveness +
+      valence +
+      tempo +
+      duration +
+      C + `C#|Db` + D + `D#|Eb` +
+      E + `F` + `F#|Gb` + G +
+      `G#|Ab` + A + `A#|Bb` + B +
+      c01 + c02 + c03 + c04 + c05 + c06 +
+      c07 + c08 + c09 + c10 + c11 + c12,
+    data = clus
+  ) |>
+  step_center(all_predictors()) |>
+  step_scale(all_predictors()) |> 
+  # step_range(all_predictors()) |> 
+  prep(clus |> mutate(track.name = str_trunc(track.name, 20))) |>
+  juice() |>
+  column_to_rownames("track.name")
+
+```
+```{r, echo=FALSE}
+clus_dist <- dist(clus_av_juice, method = "euclidean")
+clus_dist |> 
+  hclust(method = "average") |> # Try single, average, and complete.
+  dendro_data() |>
+  ggdendrogram()
+```
+</div>
+
+### Kygo (Hierarchical cluster)
+<div class="myDiv">
+```{r, echo=FALSE}
+clus <-
+  get_playlist_audio_features("", "2M0XZxqAd3THfF3xWLJlSi") |>
+  add_audio_analysis() |>
+  mutate(
+    segments = map2(segments, key, compmus_c_transpose),
+    pitches =
+      map(segments,
+          compmus_summarise, pitches,
+          method = "mean", norm = "manhattan"
+      ),
+    timbre =
+      map(
+        segments,
+        compmus_summarise, timbre,
+        method = "mean"
+      )
+  ) |>
+  mutate(pitches = map(pitches, compmus_normalise, "clr")) |>
+  mutate_at(vars(pitches, timbre), map, bind_rows) |>
+  unnest(cols = c(pitches, timbre))
+
+clus_juice <-
+  recipe(
+    track.name ~
+      danceability +
+      energy +
+      loudness +
+      speechiness +
+      acousticness +
+      instrumentalness +
+      liveness +
+      valence +
+      tempo +
+      duration +
+      C + `C#|Db` + D + `D#|Eb` +
+      E + `F` + `F#|Gb` + G +
+      `G#|Ab` + A + `A#|Bb` + B +
+      c01 + c02 + c03 + c04 + c05 + c06 +
+      c07 + c08 + c09 + c10 + c11 + c12,
+    data = clus
+  ) |>
+  step_center(all_predictors()) |>
+  step_scale(all_predictors()) |> 
+  # step_range(all_predictors()) |> 
+  prep(clus |> mutate(track.name = str_trunc(track.name, 20))) |>
+  juice() |>
+  column_to_rownames("track.name")
+
+```
+```{r, echo=FALSE}
+
+clus_dist <- dist(clus_juice, method = "euclidean")
+clus_dist |> 
+  hclust(method = "complete") |> # Try single, average, and complete.
+  dendro_data() |>
+  ggdendrogram()
+```
+</div>
+
+Conclusion
+=====================================
+
+Column {data-width=500}
+-----------------------------------------------------------------------
+After analyzing the self-made corpus of Avicii and Kygo we can conclude a few things. <br>
+<br>
+First of all, there is a clear distinction between the music of Avicii and Kygo if you listen to their songs by yourself. However, if we look at all the plots in this report, I do not think an average person would classify their songs 100% correctly. Of course, their music genres are close to each other if we look at all the genres that are available on Spotify. And if you have a lot of musical knowledge about chords and stuff, maybe it would be easier to distinguish their songs based on the plots. In the end, I can conclude for myself that I expected more difference in statistical terms. <br>
+<br>
+In this report, I also tried to see if I could see a change over time in their music. I only addressed this topic in the tab "Over the years", because of the number of songs I analysed. If I look at a change over time, I need a lot of songs and this was not really doable with more complex plots. In this tab however, we already concluded that there is not really a change to see. It could be that there is in fact a change existing, but in other features that I have not addressed or features outside Spotify's capabilities. For example, I think that there is a change in Avicii's lyrics. This is especially noticeable in his latest album. <br>
+<br>
+Next to the notes I mentioned within the different tabs, there are some other small notes that are not really worth mentioning, but did affect this report. Nevertheless, I hope you enjoyed reading my report. I really enjoyed making it, so at least someone is happy with it. Analyzing two of my favorite artists is not something I do everyday. Thanks for reading this report :)
+
+
